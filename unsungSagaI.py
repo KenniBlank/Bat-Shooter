@@ -78,17 +78,28 @@ def introOutro(folderPath , number):
 
 
 def gameloop():
+    # gun
     shoot = False
     currentImageIndex = 0
-    gunImages = loadImages('images/gun', (250, 250))
+    gunImages = loadImages('images/handgun', (250, 250))
+    
+    # bat
     scaleBat = 20
     batImages = loadImages('images/batHorizontal', (scaleBat, scaleBat))
-
-    # Random class for spawning of the bats:
-    x = random.randint(20, max_width - 20)
+    batImages2 = loadImages('images/batVertical', (scaleBat,scaleBat))
+    x = random.randint(20, max_width - 40)
     y = random.randint(20, max_height - 300)
-    batIndex = 0
+    batIndex1 = 0
+    batIndex2 = 0
     batShot = 0
+
+    # zombie
+    scaleZombie = 10
+    zombieImages = loadImages('images/zombie', (scaleZombie, scaleZombie))
+    zombieImages2 = loadImages('images/zombie2', (scaleZombie, scaleZombie))
+    zombieIndex1 = 0
+    zombieIndex2 = 0
+
 
     text_font = pygame.font.Font('font/Pixeltype.ttf', 30)
     foranimation = {}
@@ -98,13 +109,13 @@ def gameloop():
         gunCrossRect = gunCross.get_rect(center=(mouse_pos[0], mouse_pos[1]))
 
         # Scaling the bat
-        tempBatImage = pygame.transform.scale(batImages[batIndex], (scaleBat, scaleBat))
+        tempBatImage = pygame.transform.scale(batImages[batIndex1], (scaleBat, scaleBat))
         if int(scaleBat) == 100:
             lose()
-        if batIndex < len(batImages) - 1:
-            batIndex += 1
+        if batIndex1 < len(batImages) - 1:
+            batIndex1 += 1
         else:
-            batIndex = 0
+            batIndex1 = 0
 
         batKilled = f"BatKilled: {batShot}"
         text_surface = text_font.render(batKilled, False, 'White')
@@ -125,7 +136,7 @@ def gameloop():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
-            if event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYUP:
                 if event.key == pygame.K_ESCAPE:
                     introOutro('images/outro', 1)
                     exit()
