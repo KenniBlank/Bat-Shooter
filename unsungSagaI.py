@@ -79,14 +79,14 @@ def gameloop():
     batImages = loadImages('images/batHorizontal', (scaleBat, scaleBat))
     batIndex = 0
     batShot = 0
-    x, y = random.randint(20, max_width - 40), random.randint(20, max_height - 300)
+    x, y = random.randint(20, max_width - int(max_width / 5)), random.randint(20, max_height - int(max_height / 4))
 
     # Zombie configuration
     scaleZombie = 30
-    zombieImages = loadImages('images/zombie2', (scaleZombie, scaleZombie))
+    zombieImages = loadImages('images/zombie', (scaleZombie, scaleZombie))
     zombieIndex = 0
     zombieShot = 0
-    zombieX, zombieY = random.randint(max_width/ 4, max_width - max_width/4), max_height - 400
+    zombieX, zombieY = random.randint(int(max_width / 4), max_width - int(max_width / 4)), max_height - 400
 
     # Fonts and animations
     text_font = pygame.font.Font('font/Pixeltype.ttf', 30)
@@ -119,7 +119,7 @@ def gameloop():
         batKilledSurface = text_font.render(batKilledText, False, 'White')
         screen.blit(batKilledSurface, (max_width - 15 * len(batKilledText), 50))
 
-        for value in list(batAnimation):
+        for value in list(batAnimation.keys()):
             screen.blit(pygame.transform.scale(pygame.transform.flip(batImages[3], False, True), (batAnimation[value][1], batAnimation[value][1])), (value, batAnimation[value][0]))
             if batAnimation[value][0] > max_height * 0.75:
                 del batAnimation[value]
@@ -138,7 +138,7 @@ def gameloop():
                     batShot += 1
                     batAnimation[x] = [y, scaleBat]
                     scaleBat = 20
-                    x, y = random.randint(20, max_width - 20), random.randint(20, max_height - 300)
+                    x, y = random.randint(20, max_width - int(max_width / 5)), random.randint(20, max_height - int(max_height / 4))
                 if zombieImage.get_rect(topleft=(zombieX, zombieY)).collidepoint(mouse_pos):
                     zombieShot += 1
                     zombieAnimation[zombieX] = [zombieY, scaleZombie]
@@ -152,7 +152,7 @@ def gameloop():
                 currentImageIndex = 0
 
         scaleBat += random.random()
-        scaleZombie += random.random() * 5
+        scaleZombie += random.random()
 
         # Display gun image
         screen.blit(gunImages[currentImageIndex], (mouse_pos[0] - 110, max_height - 250))
