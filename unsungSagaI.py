@@ -31,7 +31,7 @@ gunCross = pygame.image.load('images/cross.png').convert_alpha()
 gunCross = pygame.transform.scale(gunCross, (20, 20))
 
 # Load and resize background image using PIL
-background = pygame.image.load('images/background.jpg').convert()
+background = pygame.image.load('images/background.jpeg').convert()
 backgroundImage = pygame.transform.scale(background, (max_width, max_height))
 
 def main():
@@ -39,9 +39,7 @@ def main():
     gameloop()
 
 def start():
-    introOutro('images/intro', 0)
-    gameloop()
-    pass
+    introOutro('images/intro', 0)   
 
 
 def introOutro(folderPath , number):
@@ -93,6 +91,7 @@ def gameloop():
     batShot = 0
 
     text_font = pygame.font.Font('font/Pixeltype.ttf', 30)
+    foranimation = {}
 
     while True:
         mouse_pos = pygame.mouse.get_pos()
@@ -113,6 +112,15 @@ def gameloop():
         screen.blit(gunCross, gunCrossRect)
         screen.blit(tempBatImage, (x, y));
         screen.blit(text_surface, (max_width - 15 * len(batKilled), 50))
+        for value in list(foranimation):
+            
+            screen.blit(pygame.transform.scale(pygame.transform.flip(batImages[3], False, True), (foranimation[value][1],foranimation[value][1])), (value, foranimation[value][0]))
+            if (foranimation[value][0] > (max_height * 0.75)):
+                pass
+            else:
+                foranimation[value][0] += 5
+                # del foranimation[value]
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -131,7 +139,8 @@ def gameloop():
                     batShot += 1
                     tempX = x
                     tempY = y
-                    # batwingDownImage = pygame.transform.flip(batwingDownImage, False, True)
+                    foranimation[x] = [y, scaleBat];
+                    
                     # while tempY < 200:
                     #     screen.blit(batwingDownImage, (tempX, tempY))
                     #     tempY -= 5
