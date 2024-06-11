@@ -119,7 +119,6 @@ def gameloop():
                 pass
             else:
                 foranimation[value][0] += 5
-                # del foranimation[value]
 
 
         for event in pygame.event.get():
@@ -140,10 +139,6 @@ def gameloop():
                     tempX = x
                     tempY = y
                     foranimation[x] = [y, scaleBat];
-                    
-                    # while tempY < 200:
-                    #     screen.blit(batwingDownImage, (tempX, tempY))
-                    #     tempY -= 5
                     scaleBat = 20
 
                     x = random.randint(20, max_width - 20)
@@ -154,8 +149,6 @@ def gameloop():
             if currentImageIndex >= len(gunImages):
                 shoot = False
                 currentImageIndex = 0
-
-        
 
         scaleBat += random.random()
 
