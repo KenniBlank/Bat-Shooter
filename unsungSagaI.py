@@ -69,6 +69,14 @@ def introOutro(folderPath, number):
                 exit()
 
 def gameloop():
+    heart = 3
+    spawnTotal = 10
+
+    # to slow down animation:
+    shoot = 0
+    fly = 0
+    crawl = 0
+
     # Gun configuration
     shoot = False
     currentImageIndex = 0
@@ -82,11 +90,11 @@ def gameloop():
     x, y = random.randint(20, max_width - int(max_width / 5)), random.randint(20, max_height - int(max_height / 4))
 
     # Zombie configuration
-    scaleZombie = 30
+    scaleZombie = 50
     zombieImages = loadImages('images/zombie', (scaleZombie, scaleZombie))
     zombieIndex = 0
     zombieShot = 0
-    zombieX, zombieY = random.randint(int(max_width / 4), max_width - int(max_width / 4)), max_height - 400
+    zombieX, zombieY = random.randint(570, 700), 480
 
     # Fonts and animations
     text_font = pygame.font.Font('font/Pixeltype.ttf', 30)
@@ -95,12 +103,15 @@ def gameloop():
 
     while True:
         mouse_pos = pygame.mouse.get_pos()
+
         gunCrossRect = gunCross.get_rect(center=mouse_pos)
 
         # Update zombie image
+        zombieRect = zombieImages[zombieIndex].get_rect(midbottom = (zombieX, zombieY))
         zombieImage = pygame.transform.scale(zombieImages[zombieIndex], (scaleZombie, scaleZombie))
         zombieIndex = (zombieIndex + 1) % len(zombieImages)
-        zombieY += 2
+        zombieY += 0.1
+
 
         # Update bat image
         batImage = pygame.transform.scale(batImages[batIndex], (scaleBat, scaleBat))
@@ -115,10 +126,20 @@ def gameloop():
         screen.blit(batImage, (x, y))
         screen.blit(zombieImage, (zombieX, zombieY))
 
-        batKilledText = f"Bat Killed: {batShot}"
-        batKilledSurface = text_font.render(batKilledText, False, 'White')
-        screen.blit(batKilledSurface, (max_width - 15 * len(batKilledText), 50))
+        KilledText = f"Bat Killed: {batShot}"
+        KilledSurface = text_font.render(KilledText, False, 'White')
+        screen.blit(KilledSurface, (max_width - 10 * len(KilledText), 50))
 
+        KilledText = f"Zombie Killed: {zombieShot}"
+        KilledSurface = text_font.render(KilledText, False, 'White')
+        screen.blit(KilledSurface, (max_width - 10 * len(KilledText), 30))
+
+        KilledText = f"Left: {spawnTotal - zombieShot - batShot}"
+        KilledSurface = text_font.render(KilledText, False, 'White')
+        screen.blit(KilledSurface, (max_width - 10 * len(KilledText), 10))
+
+        if (spawnTotal == (zombieShot + batShot)):
+            introOutro('images/outro', 1)
         for value in list(batAnimation.keys()):
             screen.blit(pygame.transform.scale(pygame.transform.flip(batImages[3], False, True), (batAnimation[value][1], batAnimation[value][1])), (value, batAnimation[value][0]))
             if batAnimation[value][0] > max_height * 0.75:
@@ -143,19 +164,17 @@ def gameloop():
                     zombieShot += 1
                     zombieAnimation[zombieX] = [zombieY, scaleZombie]
                     scaleZombie = 30
-                    zombieX, zombieY = random.randint(100, max_width - 100), max_height - 300
+                    zombieX, zombieY = random.randint(570, 700), 480
 
         if shoot:
             currentImageIndex += 1
             if currentImageIndex >= len(gunImages):
                 shoot = False
                 currentImageIndex = 0
+            screen.blit(gunImages[currentImageIndex], (mouse_pos[0] - 110, max_height - 250))
 
         scaleBat += random.random()
         scaleZombie += random.random()
-
-        # Display gun image
-        screen.blit(gunImages[currentImageIndex], (mouse_pos[0] - 110, max_height - 250))
 
         pygame.display.flip()
         clock.tick(24)
