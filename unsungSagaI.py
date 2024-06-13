@@ -31,15 +31,53 @@ gunCross = pygame.image.load('images/cross.png').convert_alpha()
 gunCross = pygame.transform.scale(gunCross, (20, 20))
 
 # Load and resize background image
-background = pygame.image.load('images/background.jpeg').convert()
+background = pygame.image.load('images/backgroundRoad.jpg').convert()
 backgroundImage = pygame.transform.scale(background, (max_width, max_height))
 
 def main():
-    start()
+    introOutro('images/intro', 0)
+    introText()
     gameloop()
 
-def start():
-    introOutro('images/intro', 0)
+
+def introText():
+    textIndex = 0
+    texts = ["Hey Hero!", "Apocalypse has Hit your city!"]
+    text_font = pygame.font.Font('font/Pixeltype.ttf', 50)
+    text_surface = text_font.render(texts[textIndex], False, "Black")
+
+    images = loadImages('images/textBackground', (max_width, max_height))
+    bubble = pygame.image.load('images/textBubble.png').convert_alpha()
+    bubble = pygame.transform.scale(bubble, (max_width / 2, max_height / 2))
+
+    index = 0
+    slowdownRate = 0
+    appearingText = 0
+    while True:
+        text_surface = text_font.render(texts[textIndex][:appearingText], False, "White")
+        if appearingText != len(texts[textIndex]):
+            appearingText += 1
+        if index < (len(images) - 1):
+            slowdownRate += 0.02
+            index += int(slowdownRate);
+        else:
+            slowdownRate = 0
+            index = 0
+
+        screen.blit(images[index], (0,0))
+        # screen.blit(bubble, (max_width/ 5, max_height / 5))
+        screen.blit(text_surface, (max_width / 2 - 7 * len(texts[textIndex]), max_height / 4))
+        pygame.display.flip()
+        clock.tick(10)
+
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    if textIndex < len(texts) - 1:
+                        textIndex += 1
+                    elif textIndex == len(texts) - 1:
+                        return
+                    appearingText = 0
 
 def introOutro(folderPath, number):
     # Text configuration
@@ -109,13 +147,23 @@ def gameloop():
         # Update zombie image
         zombieRect = zombieImages[zombieIndex].get_rect(midbottom = (zombieX, zombieY))
         zombieImage = pygame.transform.scale(zombieImages[zombieIndex], (scaleZombie, scaleZombie))
-        zombieIndex = (zombieIndex + 1) % len(zombieImages)
+        if zombieIndex < len(zombieImages) - 1:
+            crawl += 0.3
+            zombieIndex = int(crawl)
+        else:
+            zombieIndex = 0
+            crawl = 0
         zombieY += 0.1
 
 
         # Update bat image
         batImage = pygame.transform.scale(batImages[batIndex], (scaleBat, scaleBat))
-        batIndex = (batIndex + 1) % len(batImages)
+        if batIndex < len(batImages) - 1:
+            fly += 0.4
+            batIndex = int(fly)
+        else:
+            batIndex = 0
+            fly = 0
 
         if int(scaleBat) >= 100:
             lose()
@@ -165,12 +213,16 @@ def gameloop():
                     zombieAnimation[zombieX] = [zombieY, scaleZombie]
                     scaleZombie = 30
                     zombieX, zombieY = random.randint(570, 700), 480
-
+            # if pygame.mouse.get_pressed()[0]:
+            #     shoot = True
+        
         if shoot:
-            currentImageIndex += 1
-            if currentImageIndex >= len(gunImages):
-                shoot = False
+            if currentImageIndex < len(gunImages) - 1:
+                shoot += 0.4
+                currentImageIndex = int(shoot)
+            else:
                 currentImageIndex = 0
+                shoot = 0
             screen.blit(gunImages[currentImageIndex], (mouse_pos[0] - 110, max_height - 250))
 
         scaleBat += random.random()
