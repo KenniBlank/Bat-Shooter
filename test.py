@@ -220,8 +220,6 @@ def gameloop():
                     zombieAnimation[zombieX] = [zombieY, scaleZombie]
                     scaleZombie = 30
                     zombieX, zombieY = random.randint(570, 700), 480
-            # if pygame.mouse.get_pressed()[0]:
-            #     shoot = True
         
         if shoot:
             if currentImageIndex < len(gunImages) - 1:
