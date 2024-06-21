@@ -1,56 +1,6 @@
-import pygame, os, random
-from gameClasses import Gun
-
-class Bat(pygame.sprite.Sprite):
-    display_info = pygame.display.Info()
-    max_width = display_info.current_w
-    max_height = display_info.current_h
-    tmp = 0
-
-    def __init__(self, listOfBatImages, scale, screen):
-        super().__init__()
-        self.batImages = listOfBatImages
-        self.scale = scale 
-        self.screen = screen
-
-        self.batImageIndex = 0
-        self.spawnX = Bat.max_width / 2
-        self.spawnY = Bat.max_height / 2
-        self.spawn()
-
-    def hitTest(self, gunCross, gunCrossX, gunCrossY):
-        scaled_bat_image = pygame.transform.scale(self.batImages[self.batImageIndex], (self.scale, self.scale))
-        bat_rect = scaled_bat_image.get_rect(topleft=(self.spawnX, self.spawnY))
-        gunCross_rect = gunCross.get_rect(topleft=(gunCrossX, gunCrossY))
-        
-        return bat_rect.colliderect(gunCross_rect)
-    
-    def update(self):
-        self.batdraw()
-
-    def spawn(self):
-        self.spawnX = random.randint(10, Bat.max_width - 50)
-        self.spawnY = random.randint(10, Bat.max_height - Bat.max_height / 3)
-        self.scale = 40
-    
-    def batdraw(self):
-        Bat.tmp += (random.randint(1, 6) / 10)
-        self.scale += (random.randint(1, 5) / 10)
-        self.batImageIndex = int(Bat.tmp) 
-        self.screen.blit(pygame.transform.scale(self.batImages[self.batImageIndex], (self.scale, self.scale)), (self.spawnX, self.spawnY))
-        if self.batImageIndex >= len(self.batImages) - 1:
-            self.batImageIndex = 0
-            Bat.tmp = 0
-
-    def downfall(self):
-        self.batImageIndex = len(self.batImages) - 1
-        self.screen.blit(pygame.transform.flip(pygame.transform.scale(self.batImages[self.batImageIndex], (self.scale, self.scale)), False, True), (self.spawnX, self.spawnY))
-        self.spawnY += 9
-        if self.spawnY >= Bat.max_height:
-            # health
-            self.spawn()
-
-    
+import pygame, os, random, time
+from gameClasses import Gun, Bat
+ 
 
 class Background():
     intro = True
@@ -58,6 +8,21 @@ class Background():
         self.listOfIntroImages = introImages
         self.listOfOutroImages = outroImages
         self.screen = screen
+        
+        self.textsIntro = ["Hey Hero!",
+             "Apocalypse Has Hit Your City!", 
+             "Zombies And Bats Have OverRun Your City", 
+             "The City Needs You", 
+             "Start By Getting Used To Your Pistol"]
+        
+        self.textsOutro = ["You have saved the city for the night!",
+                           "You are the Unsung Hero of this city.",
+                           "You protect from dark, hide your identiy, no help all for this city",
+                           "GoodNight Hero!",
+                           "Enter to Exit",
+                           ]
+        self.textsIntroIndex = 0
+        self.textsOutroIndex = 0
 
         self.introIndex = 0
         self.outroIndex = 0
@@ -72,18 +37,23 @@ class Background():
 
     def draw(self, num):
         if num == 0:
+
             self.introIndex += 1
             self.screen.blit(self.listOfIntroImages[self.introIndex], (0, 0))
             if self.introIndex >= len(self.listOfIntroImages) - 1:
                 self.introIndex = 0
+            if self.textsIntroIndex >= len(self.textsIntro):
+                return True
+            
+            return False
+
         else:
             self.outroIndex += 1
             self.screen.blit(self.listOfOutroImages[self.outroIndex], (0, 0))
             if self.outroIndex >= len(self.listOfOutroImages) - 1:
                 self.outroIndex = 0
-
-class Scene():
-    pass
+        
+        
 
 
 def main():
@@ -91,6 +61,7 @@ def main():
     clock = pygame.time.Clock()
 
     GameScore = 0
+    GameState = True
 
     display_info = pygame.display.Info()
     max_width = display_info.current_w
@@ -111,6 +82,11 @@ def main():
         loadImages('images/outro', (max_width, max_height)),
         screen
     )
+
+    # Font
+    font_size = 30
+    text_font = pygame.font.Font('font/Pixeltype.ttf', font_size)
+
     # Intro 
     while True:
         exitLoop = False
@@ -128,11 +104,14 @@ def main():
             break
 
         pygame.display.flip()
-        clock.tick(24)
+        clock.tick(10)
 
     # Game
     while True:
-        GameState = True
+        if Bat.batShot >= 12:
+            GameState = False
+
+        # GameState = True
         screen.fill((125, 25, 25))
 
         # everythingBackground.update()
@@ -145,8 +124,8 @@ def main():
                 gun.bulletShot(gun.bulletInGun)
                 if bat.hitTest(gun.gunCrossImage, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]):
                     GameScore += 1
-                    gun.maxBullet += 1;
                     bat.spawn()
+                    Bat.batShot += 1
                 gun.update(True)
             if event.type == pygame.KEYUP: 
                 if event.key == pygame.K_ESCAPE:
@@ -161,9 +140,18 @@ def main():
         if GameState == False:
             break
         gun.update()
+
+        text = f"You have shot {Bat.batShot} monsters"
+        text_surface = text_font.render(text, False, 'White')
+        screen.blit(text_surface, (len(text), font_size))
+
         pygame.display.flip()
         clock.tick(24)
     
+
+    Background.intro = False
+    text = f"You have shot {Bat.batShot} monsters"
+
     # Outro
     while True:
         exitLoop = False
@@ -178,7 +166,7 @@ def main():
             Gun.intro = False
             break
         pygame.display.flip()
-        clock.tick(24)
+        clock.tick(10)
 
 def loadImages(folderPath, imageSize):
     image_files = [imageFile for imageFile in os.listdir(folderPath) if imageFile.lower().endswith('.png')]

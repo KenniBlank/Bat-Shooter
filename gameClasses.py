@@ -1,4 +1,5 @@
-import pygame
+import pygame, random
+
 
 class Gun(pygame.sprite.Sprite):
     pygame.init()
@@ -120,3 +121,45 @@ class Gun(pygame.sprite.Sprite):
                 self.maxBullet = 0
             pygame.time.wait(int(pygame.mixer.Sound("audio/gunReload.wav").get_length() * 400))
             return True
+        
+class Bat(pygame.sprite.Sprite):
+    display_info = pygame.display.Info()
+    max_width = display_info.current_w
+    max_height = display_info.current_h
+    tmp = 0
+    batShot = 0
+
+    def __init__(self, listOfBatImages, scale, screen):
+        super().__init__()
+        self.batImages = listOfBatImages
+        self.scale = scale 
+        self.screen = screen
+
+        self.batImageIndex = 0
+        self.spawnX = Bat.max_width / 2
+        self.spawnY = Bat.max_height / 2
+        self.spawn()
+
+    def hitTest(self, gunCross, gunCrossX, gunCrossY):
+        scaled_bat_image = pygame.transform.scale(self.batImages[self.batImageIndex], (self.scale, self.scale))
+        bat_rect = scaled_bat_image.get_rect(topleft=(self.spawnX, self.spawnY))
+        gunCross_rect = gunCross.get_rect(topleft=(gunCrossX, gunCrossY))
+        
+        return bat_rect.colliderect(gunCross_rect)
+    
+    def update(self):
+        self.batdraw()
+
+    def spawn(self):
+        self.spawnX = random.randint(10, Bat.max_width - 50)
+        self.spawnY = random.randint(10, Bat.max_height - Bat.max_height / 3)
+        self.scale = 40
+    
+    def batdraw(self):
+        Bat.tmp += (random.randint(1, 6) / 10)
+        self.scale += (random.randint(1, 5) / 10)
+        self.batImageIndex = int(Bat.tmp) 
+        self.screen.blit(pygame.transform.scale(self.batImages[self.batImageIndex], (self.scale, self.scale)), (self.spawnX, self.spawnY))
+        if self.batImageIndex >= len(self.batImages) - 1:
+            self.batImageIndex = 0
+            Bat.tmp = 0
