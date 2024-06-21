@@ -1,40 +1,54 @@
-import pygame, os
+import pygame, os, random
 from gameClasses import Gun
 
 class Bat(pygame.sprite.Sprite):
+    display_info = pygame.display.Info()
+    max_width = display_info.current_w
+    max_height = display_info.current_h
+    tmp = 0
+
     def __init__(self, listOfBatImages, scale, screen):
         super().__init__()
         self.batImages = listOfBatImages
-        self.scale = scale # Is a tupple of X, Y so change accordingly
+        self.scale = scale 
         self.screen = screen
 
         self.batImageIndex = 0
-        self.spawnX = 40
-        self.spawnY = 40
+        self.spawnX = Bat.max_width / 2
+        self.spawnY = Bat.max_height / 2
+        self.spawn()
 
-    def hitTest(self):
-        pass
-
+    def hitTest(self, gunCross, gunCrossX, gunCrossY):
+        scaled_bat_image = pygame.transform.scale(self.batImages[self.batImageIndex], (self.scale, self.scale))
+        bat_rect = scaled_bat_image.get_rect(topleft=(self.spawnX, self.spawnY))
+        gunCross_rect = gunCross.get_rect(topleft=(gunCrossX, gunCrossY))
+        
+        return bat_rect.colliderect(gunCross_rect)
+    
     def update(self):
-        self.draw()
+        self.batdraw()
 
     def spawn(self):
-        pass
-
-    def sound(self):
-        pass
-
-    def shot(self):
-        pass
-
-    def draw(self):
-        self.batImageIndex += 1
-        self.screen.blit(self.batImages[self.batImageIndex], (self.spawnX, self.spawnY))
+        self.spawnX = random.randint(10, Bat.max_width - 50)
+        self.spawnY = random.randint(10, Bat.max_height - Bat.max_height / 3)
+        self.scale = 40
+    
+    def batdraw(self):
+        Bat.tmp += (random.randint(1, 6) / 10)
+        self.scale += (random.randint(1, 5) / 10)
+        self.batImageIndex = int(Bat.tmp) 
+        self.screen.blit(pygame.transform.scale(self.batImages[self.batImageIndex], (self.scale, self.scale)), (self.spawnX, self.spawnY))
         if self.batImageIndex >= len(self.batImages) - 1:
             self.batImageIndex = 0
-        self.spawnX += 1
-        self.spawnY += 1
-        
+            Bat.tmp = 0
+
+    def downfall(self):
+        self.batImageIndex = len(self.batImages) - 1
+        self.screen.blit(pygame.transform.flip(pygame.transform.scale(self.batImages[self.batImageIndex], (self.scale, self.scale)), False, True), (self.spawnX, self.spawnY))
+        self.spawnY += 9
+        if self.spawnY >= Bat.max_height:
+            # health
+            self.spawn()
 
 class Background():
     intro = True
@@ -88,7 +102,7 @@ def main():
         screen, 25, 'images/cross.png', 'images/bullet.png', 12
     )
     
-    bat = Bat(loadImages('images/batVertical', (20, 20)), (20, 20), screen)
+    bat = Bat(loadImages('images/batHorizontal', (20, 20)), 20, screen)
 
     everythingBackground = Background(
         loadImages('images/intro', (max_width, max_height)),
@@ -113,12 +127,12 @@ def main():
 
         pygame.display.flip()
         clock.tick(24)
-    
 
     # Game
     while True:
         GameState = True
         screen.fill((125, 25, 25))
+
         # everythingBackground.update()
         bat.update()
         for event in pygame.event.get():
@@ -127,16 +141,20 @@ def main():
                 exit()
             if event.type == pygame.MOUSEBUTTONUP:
                 gun.bulletShot(gun.bulletInGun)
+                if bat.hitTest(gun.gunCrossImage, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]):
+                    GameScore += 1
+                    gun.maxBullet += 1;
+                    bat.spawn()
                 gun.update(True)
             if event.type == pygame.KEYUP: 
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     exit()
                 if event.key == pygame.K_r:
-                    if gun.bulletInGun < 6:
-                        bulletReloadedAmount = 6
+                    if gun.bulletInGun < 12:
+                        bulletReloadedAmount = 12
                         if gun.gunReload():
-                            gun.update(6, bulletReloadedAmount)
+                            gun.update(12, bulletReloadedAmount)
 
         if GameState == False:
             break
