@@ -1,6 +1,7 @@
 import pygame, random
 
 
+
 class Gun(pygame.sprite.Sprite):
     pygame.init()
     display_info = pygame.display.Info()
@@ -163,3 +164,65 @@ class Bat(pygame.sprite.Sprite):
         if self.batImageIndex >= len(self.batImages) - 1:
             self.batImageIndex = 0
             Bat.tmp = 0
+
+class Background():
+    intro = True
+    def __init__(self, introImages, outroImages, screen, width, height):
+        self.listOfIntroImages = introImages
+        self.listOfOutroImages = outroImages
+        self.screen = screen
+        self.width = width
+        self.height = height
+
+        self.font_size = 30
+        self.text_font = pygame.font.Font('font/Pixeltype.ttf', self.font_size)
+        self.textsIntro = ["Hey Hero!",
+             "Apocalypse Has Hit Your City!", 
+             "Zombies And Bats Have OverRun Your City", 
+             "The City Needs You", 
+             "Start By Getting Used To Your Pistol"]
+        
+        self.textsOutro = ["You have saved the city for the night!",
+                           "You are the Unsung Hero of this city.",
+                           "You protect from dark, hide your identiy, no help all for this city",
+                           "GoodNight Hero!",
+                           "Enter to Exit",
+                           ]
+        self.textsIntroIndex = 0
+        self.textsOutroIndex = 0
+
+        self.introIndex = 0
+        self.outroIndex = 0
+
+    def update(self):
+        if Background.intro == True:
+            # 0 for intro
+            self.draw(0)
+        else:
+            # 1 for outro
+            self.draw(1)
+
+    def draw(self, num):
+        if num == 0:
+            text_surface = self.text_font.render(self.textsIntro[self.textsIntroIndex], False, 'Grey')
+            self.introIndex += 1
+            self.screen.blit(self.listOfIntroImages[self.introIndex], (0, 0))
+            if self.introIndex >= len(self.listOfIntroImages) - 1:
+                self.introIndex = 0
+
+            if self.textsIntroIndex >= len(self.textsIntro) - 1:
+                return True
+            self.screen.blit(text_surface, (self.width / 2 - len(self.textsIntro[self.textsIntroIndex] * 4), self.height / 2))
+            return False
+
+        else:
+            text_surface = self.text_font.render(self.textsOutro[self.textsOutroIndex], False, 'Grey')
+            self.outroIndex += 1
+            self.screen.blit(self.listOfOutroImages[self.outroIndex], (0, 0))
+            if self.outroIndex >= len(self.listOfOutroImages) - 1:
+                self.outroIndex = 0
+
+            if self.textsOutroIndex >= len(self.textsOutro) - 1:
+                return True
+            self.screen.blit(text_surface, (self.width / 2 - len(self.textsIntro[self.textsIntroIndex] * 4), self.height / 2 - 1/4 * self.height))
+            return False

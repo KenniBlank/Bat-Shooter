@@ -1,59 +1,5 @@
 import pygame, os, random, time
-from gameClasses import Gun, Bat
- 
-
-class Background():
-    intro = True
-    def __init__(self, introImages, outroImages, screen):
-        self.listOfIntroImages = introImages
-        self.listOfOutroImages = outroImages
-        self.screen = screen
-        
-        self.textsIntro = ["Hey Hero!",
-             "Apocalypse Has Hit Your City!", 
-             "Zombies And Bats Have OverRun Your City", 
-             "The City Needs You", 
-             "Start By Getting Used To Your Pistol"]
-        
-        self.textsOutro = ["You have saved the city for the night!",
-                           "You are the Unsung Hero of this city.",
-                           "You protect from dark, hide your identiy, no help all for this city",
-                           "GoodNight Hero!",
-                           "Enter to Exit",
-                           ]
-        self.textsIntroIndex = 0
-        self.textsOutroIndex = 0
-
-        self.introIndex = 0
-        self.outroIndex = 0
-
-    def update(self):
-        if Background.intro == True:
-            # 0 for intro
-            self.draw(0)
-        else:
-            # 1 for outro
-            self.draw(1)
-
-    def draw(self, num):
-        if num == 0:
-
-            self.introIndex += 1
-            self.screen.blit(self.listOfIntroImages[self.introIndex], (0, 0))
-            if self.introIndex >= len(self.listOfIntroImages) - 1:
-                self.introIndex = 0
-            if self.textsIntroIndex >= len(self.textsIntro):
-                return True
-            
-            return False
-
-        else:
-            self.outroIndex += 1
-            self.screen.blit(self.listOfOutroImages[self.outroIndex], (0, 0))
-            if self.outroIndex >= len(self.listOfOutroImages) - 1:
-                self.outroIndex = 0
-        
-        
+from gameClasses import Gun, Bat, Background     
 
 
 def main():
@@ -80,7 +26,9 @@ def main():
     everythingBackground = Background(
         loadImages('images/intro', (max_width, max_height)),
         loadImages('images/outro', (max_width, max_height)),
-        screen
+        screen,
+        max_width,
+        max_height
     )
 
     # Font
@@ -89,18 +37,17 @@ def main():
 
     # Intro 
     while True:
-        exitLoop = False
-        everythingBackground.update()
+        everythingBackground.draw(0)
     
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
             if event.type == pygame.KEYUP and event.key == pygame.K_RETURN:
-                exitLoop = True
+                everythingBackground.textsIntroIndex += 1
 
-        if exitLoop == True:
-            Gun.intro = False
+        if everythingBackground.draw(0):
+            # Gun.intro = False
             break
 
         pygame.display.flip()
@@ -154,17 +101,18 @@ def main():
 
     # Outro
     while True:
-        exitLoop = False
-        everythingBackground.update()
+        everythingBackground.draw(1)
+    
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
             if event.type == pygame.KEYUP and event.key == pygame.K_RETURN:
-                exitLoop = True
-        if exitLoop == True:
-            Gun.intro = False
+                everythingBackground.textsIntroIndex += 1
+
+        if everythingBackground.draw(0):
             break
+
         pygame.display.flip()
         clock.tick(10)
 
