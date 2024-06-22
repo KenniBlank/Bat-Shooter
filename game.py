@@ -1,23 +1,23 @@
-import pygame, os, random, time
+import pygame, os
 from gameClasses import Gun, Bat, Background     
 
 
 def main():
     pygame.init()
     clock = pygame.time.Clock()
+    pygame.display.set_caption('Bat Shooter')
 
     GameScore = 0
     GameState = True
 
-    display_info = pygame.display.Info()
-    max_width = display_info.current_w
-    max_height = display_info.current_h
+    max_width = 1366
+    max_height = 766
 
     screen = pygame.display.set_mode((max_width, max_height))
     pygame.mouse.set_visible(False)
 
     gun = Gun(
-        10, loadImages('images/handGun', (200, 250)), 
+        12, loadImages('images/handGun', (200, 250)), 
         screen, 25, 'images/cross.png', 'images/bullet.png', 12
     )
     
@@ -36,22 +36,8 @@ def main():
     text_font = pygame.font.Font('font/Pixeltype.ttf', font_size)
 
     # Intro 
-    while True:
-        everythingBackground.draw(0)
-    
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
-            if event.type == pygame.KEYUP and event.key == pygame.K_RETURN:
-                everythingBackground.textsIntroIndex += 1
+    everythingBackground.draw(0)
 
-        if everythingBackground.draw(0):
-            # Gun.intro = False
-            break
-
-        pygame.display.flip()
-        clock.tick(10)
 
     # Game
     while True:
@@ -62,7 +48,8 @@ def main():
         screen.fill((125, 25, 25))
 
         # everythingBackground.update()
-        bat.update()
+        extWhenLoss = bat.update()
+        gun.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -75,19 +62,33 @@ def main():
                     Bat.batShot += 1
                 gun.update(True)
             if event.type == pygame.KEYUP: 
-                if event.key == pygame.K_ESCAPE:
-                    pygame.quit()
-                    exit()
                 if event.key == pygame.K_r:
                     if gun.bulletInGun < 12:
-                        bulletReloadedAmount = 12
                         if gun.gunReload():
-                            gun.update(12, bulletReloadedAmount)
+                            gun.update()
+                            Gun.timeDelayGun = 24 * 1
 
-        if GameState == False:
+        if extWhenLoss:
+            while 1:
+                font_size = 60
+                text_font = pygame.font.Font('font/Pixeltype.ttf', font_size)
+                screen.fill((0, 0, 0))
+                text = "YOU DIED LOSER!"
+                text_surface = text_font.render(text, False, 'Red')
+                screen.blit(text_surface, (max_width / 2 - len(text) * 8, max_height / 2 - 1/8 * max_height))
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        exit()
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_RETURN:
+                            pygame.quit()
+                            exit()
+                pygame.display.flip()
+                clock.tick(1)
+
+        if not GameState:
             break
-        gun.update()
-
         text = f"You have shot {Bat.batShot} monsters"
         text_surface = text_font.render(text, False, 'White')
         screen.blit(text_surface, (len(text), font_size))
@@ -100,21 +101,7 @@ def main():
     text = f"You have shot {Bat.batShot} monsters"
 
     # Outro
-    while True:
-        everythingBackground.draw(1)
-    
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
-            if event.type == pygame.KEYUP and event.key == pygame.K_RETURN:
-                everythingBackground.textsIntroIndex += 1
-
-        if everythingBackground.draw(0):
-            break
-
-        pygame.display.flip()
-        clock.tick(10)
+    everythingBackground.draw(1)
 
 def loadImages(folderPath, imageSize):
     image_files = [imageFile for imageFile in os.listdir(folderPath) if imageFile.lower().endswith('.png')]
