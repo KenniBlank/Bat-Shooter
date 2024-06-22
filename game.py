@@ -22,6 +22,7 @@ def main():
     )
     
     bat = Bat(loadImages('images/batHorizontal', (20, 20)), 20, screen)
+    bat2 = Bat(loadImages('images/batVertical', (20, 20)), 20, screen)
 
     everythingBackground = Background(
         loadImages('images/intro', (max_width, max_height)),
@@ -49,6 +50,8 @@ def main():
 
         # everythingBackground.update()
         extWhenLoss = bat.update()
+        if not extWhenLoss:
+            extWhenLoss = bat2.update()
         gun.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -59,6 +62,10 @@ def main():
                 if bat.hitTest(gun.gunCrossImage, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]):
                     GameScore += 1
                     bat.spawn()
+                    Bat.batShot += 1
+                if bat2.hitTest(gun.gunCrossImage, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]):
+                    GameScore += 1
+                    bat2.spawn()
                     Bat.batShot += 1
                 gun.update(True)
             if event.type == pygame.KEYUP: 
