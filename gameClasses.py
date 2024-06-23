@@ -179,7 +179,7 @@ class Background():
         self.text_font = pygame.font.Font('font/Pixeltype.ttf', self.font_size)
         self.textsIntro = ["Hey Hero!",
              "Apocalypse Has Hit Your City!", 
-             "Zombies And Bats Have OverRun Your City", 
+             "Bats Have OverRun Your City", 
              "The City Needs You", 
              "Start By Getting Used To Your Pistol"
              ]
@@ -210,6 +210,7 @@ class Background():
         # I have no Idea how!
         clock = pygame.time.Clock()
         if num == 0:
+            i = 0
             while True:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -217,9 +218,10 @@ class Background():
                         exit()
                     if event.type == pygame.KEYUP and event.key == pygame.K_RETURN:
                         self.textsIntroIndex += 1
+                        i = 0
 
                 
-                text_surface = self.text_font.render(self.textsIntro[self.textsIntroIndex], False, 'Black')
+                text_surface = self.text_font.render(self.textsIntro[self.textsIntroIndex][:i], False, 'Black')
                 self.introIndex += 1
                 self.screen.blit(self.listOfIntroImages[self.introIndex], (0, 0))
                 if self.introIndex >= len(self.listOfIntroImages) - 1:
@@ -228,9 +230,11 @@ class Background():
                 if self.textsIntroIndex >= len(self.textsIntro) - 1:
                     return
                 self.screen.blit(text_surface, (self.width / 2 - len(self.textsIntro[self.textsIntroIndex] * 4), int(self.height / 2 - (1 / 4) * self.height)))
+                i += 1
                 pygame.display.flip()
                 clock.tick(10)
         else:
+            i = 0
             while True:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -238,8 +242,9 @@ class Background():
                         exit()
                     if event.type == pygame.KEYUP and event.key == pygame.K_RETURN:
                         self.textsOutroIndex += 1
+                        i = 0
 
-                text_surface = self.text_font.render(self.textsOutro[self.textsOutroIndex], False, 'White')
+                text_surface = self.text_font.render(self.textsOutro[self.textsOutroIndex][:i], False, 'White')
                 self.outroIndex += 1
                 self.screen.blit(self.listOfOutroImages[self.outroIndex], (0, 0))
                 if self.outroIndex >= len(self.listOfOutroImages) - 1:
@@ -248,5 +253,6 @@ class Background():
                 if self.textsOutroIndex >= len(self.textsOutro) - 1:
                     return
                 self.screen.blit(text_surface, (self.width / 2 - len(self.textsOutro[self.textsOutroIndex] * 4), int(self.height / 2 - (1 / 4) * self.height)))
+                i += 1
                 pygame.display.flip()
                 clock.tick(10)
