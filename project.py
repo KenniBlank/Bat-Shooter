@@ -5,7 +5,7 @@ from projectClasses import Gun, Bat, Background
 def main():
     pygame.init()
     clock = pygame.time.Clock()
-    pygame.display.set_caption('Bat Shooter')
+    pygame.display.set_caption('BatShooterGame')
 
     GameScore = 0
     GameState = True
