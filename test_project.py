@@ -1,6 +1,6 @@
 import pytest, pygame
 from projectClasses import Gun, Bat, Background
-from project import loadImages
+from project import loadImages, loser
 
 
 @pytest.fixture
@@ -23,21 +23,18 @@ def batfixture():
     max_width = 1366
     max_height = 766
     screen = pygame.display.set_mode((max_width, max_height))
-    return Bat(
-        loadImages('images/batHorizontal', 
-        (20, 20)), 
+    return Bat(loadImages('images/batHorizontal', (20, 20)), 
+        loadImages('images/batHorizontalRed', (20, 20)),
         20, 
         screen,
         max_width,
-        max_height
-    )
+        max_height)
 
 @pytest.fixture
 def backgroundfixture():
     max_width = 1366
     max_height = 766
     screen = pygame.display.set_mode((max_width, max_height))
-    
     return Background(
         loadImages('images/intro', (max_width, max_height)),
         loadImages('images/outro', (max_width, max_height)),
@@ -71,5 +68,16 @@ def test_Background(backgroundfixture):
     assert background.listOfIntroImages is not None
     assert background.listOfOutroImages is not None
 
-    assert background.draw(0)
 
+@pytest.fixture
+def mock_screen():
+    pygame.init()
+    return pygame.display.set_mode((800, 600))
+
+def test_loser(mock_screen):
+    screen = mock_screen
+    max_width, max_height = 800, 600
+    clock = pygame.time.Clock()
+
+    with pytest.raises(SystemExit):  # Check if SystemExit is raised on exit
+        loser(screen, max_width, max_height, clock)

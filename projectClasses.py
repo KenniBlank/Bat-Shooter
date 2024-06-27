@@ -130,17 +130,21 @@ class Bat(pygame.sprite.Sprite):
     tmp = 0
     batShot = 0
 
-    def __init__(self, listOfBatImages, scale, screen, max_width, max_height):
+    def __init__(self, listOfBatImages, listOfBatImagesRed, scale, screen, max_width, max_height):
         super().__init__()
         self.batImages = listOfBatImages
+        self.batImagesRed = listOfBatImagesRed
+        
         self.scale = scale 
         self.screen = screen
         self.max_width = int(max_width)
         self.max_height = int(max_height)
 
         self.batImageIndex = 0
+        self.batImagesTemp = listOfBatImagesRed
         self.spawnX = 0
         self.spawnY = 0
+        self.changed = False
         self.spawn()
 
     def hitTest(self, gunCross, gunCrossX, gunCrossY):
@@ -151,6 +155,14 @@ class Bat(pygame.sprite.Sprite):
     
     def update(self):
         self.batdraw()
+        if self.scale > 50 and self.changed == False:
+            self.batImages, self.batImagesRed = self.batImagesRed, self.batImages
+            self.changed = True
+            
+        if self.scale < 50 and self.changed == True:
+            self.batImages, self.batImagesRed = self.batImagesRed, self.batImages
+            self.changed = False
+
         if self.scale > 90:
             return True
 

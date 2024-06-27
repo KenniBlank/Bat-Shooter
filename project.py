@@ -1,4 +1,4 @@
-import pygame, os
+import pygame, os, random
 from projectClasses import Gun, Bat, Background     
 
 
@@ -16,42 +16,18 @@ def main():
     screen = pygame.display.set_mode((max_width, max_height))
     pygame.mouse.set_visible(False)
 
-    gun = Gun(
-        12, loadImages('images/handGun', (200, 250)), 
-        screen, 25, 
-        'images/cross.png', 
-        'images/bullet.png', 
-        12,
-        max_width,
-        max_height
-    )
-    
-    bat = Bat(loadImages('images/batHorizontal', 
-                         (20, 20)), 
-                         20, 
-                         screen,
-                         max_width,
-                         max_height)
+    gun, bat, everythingBackground = loading(screen, max_width, max_height)
 
-    everythingBackground = Background(
-        loadImages('images/intro', (max_width, max_height)),
-        loadImages('images/outro', (max_width, max_height)),
-        screen,
-        max_width,
-        max_height
-    )
-
-    # Font
     font_size = 30
     text_font = pygame.font.Font('font/Pixeltype.ttf', font_size)
 
     # Intro 
     everythingBackground.draw(0)
 
-
+    batshootCount = random.randint(12, 24)
     # Game
     while True:
-        if Bat.batShot >= 12:
+        if Bat.batShot > batshootCount - 1:
             GameState = False
 
         screen.fill((125, 25, 25))
@@ -84,6 +60,9 @@ def main():
         text = f"You have shot {Bat.batShot} monsters"
         text_surface = text_font.render(text, False, 'White')
         screen.blit(text_surface, (len(text), font_size))
+        text = f"Goal: {batshootCount}"
+        text_surface = text_font.render(text, False, 'White')
+        screen.blit(text_surface, (len(text) + 10, font_size * 2))
 
         pygame.display.flip()
         clock.tick(24)
@@ -106,9 +85,33 @@ def loadImages(folderPath, imageSize):
     return images
 
 # unnecessary function created to meet the cs50p requirement because of how useless the requirement truly is
-def nonsense():
-    pass
+# created to return the bat, gun and background variables
+def loading(screen, max_width, max_height):
+    gun = Gun(
+        12, loadImages('images/handGun', (200, 250)), 
+        screen, 25, 
+        'images/cross.png', 
+        'images/bullet.png', 
+        12,
+        max_width,
+        max_height
+    )
+    
+    bat = Bat(loadImages('images/batHorizontal', (20, 20)), 
+        loadImages('images/batHorizontalRed', (20, 20)),
+        20, 
+        screen,
+        max_width,
+        max_height)
 
+    everythingBackground = Background(
+        loadImages('images/intro', (max_width, max_height)),
+        loadImages('images/outro', (max_width, max_height)),
+        screen,
+        max_width,
+        max_height
+    )
+    return gun, bat, everythingBackground
 
 # If the player loses the game
 def loser(screen, max_width, max_height, clock):
@@ -134,7 +137,7 @@ def loser(screen, max_width, max_height, clock):
 
                 pygame.display.flip()
                 clock.tick(10)
-
+    
 
 if __name__ == "__main__":
     main()
