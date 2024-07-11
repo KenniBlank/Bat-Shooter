@@ -25,12 +25,15 @@ def main():
     everythingBackground.draw(0)
 
     batshootCount = random.randint(12, 24)
+
+    background = pygame.image.load('images/background.jpg')
+    background = pygame.transform.scale(background, (max_width, max_height))
     # Game
     while True:
         if Bat.batShot > batshootCount - 1:
             GameState = False
 
-        screen.fill((125, 25, 25))
+        screen.blit(background, (0, 0))
 
         extWhenLoss = bat.update()
         gun.update()
