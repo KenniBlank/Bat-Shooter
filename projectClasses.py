@@ -169,11 +169,11 @@ class Bat(pygame.sprite.Sprite):
     def spawn(self):
         self.spawnX = random.randint(40, self.max_width - 50)
         self.spawnY = random.randint(40, self.max_height - int(self.max_height / 3))
-        self.scale = 40
+        self.scale = 20
     
     def batdraw(self):
         Bat.tmp += (random.randint(1, 6) / 10)
-        self.scale += (0.25)
+        self.scale += (0.75)
         self.batImageIndex = int(Bat.tmp) 
         self.screen.blit(pygame.transform.scale(self.batImages[self.batImageIndex], (self.scale, self.scale)), (self.spawnX, self.spawnY))
         if self.batImageIndex >= len(self.batImages) - 1:
