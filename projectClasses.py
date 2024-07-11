@@ -107,7 +107,7 @@ class Gun(pygame.sprite.Sprite):
     def gunReload(self):
         if self.maxBullet > 0:  # Check if there are bullets in the inventory
             pygame.mixer.music.load("audio/gunReload.wav")
-            pygame.mixer.music.set_volume(0.7)
+            pygame.mixer.music.set_volume(0.8)
             pygame.mixer.music.play()
             
             needed_bullets = self.bulletToBeInGun - self.bulletInGun  # How many bullets needed to fully reload the gun
@@ -173,7 +173,7 @@ class Bat(pygame.sprite.Sprite):
     
     def batdraw(self):
         Bat.tmp += (random.randint(1, 6) / 10)
-        self.scale += (0.75)
+        self.scale += (0.8)
         self.batImageIndex = int(Bat.tmp) 
         self.screen.blit(pygame.transform.scale(self.batImages[self.batImageIndex], (self.scale, self.scale)), (self.spawnX, self.spawnY))
         if self.batImageIndex >= len(self.batImages) - 1:
